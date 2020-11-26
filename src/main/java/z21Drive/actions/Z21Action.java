@@ -1,31 +1,64 @@
 package z21Drive.actions;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.ByteBuffer;
 
 public abstract class Z21Action {
     /**
      * Represents the message in z21 understandable form.
      */
-    protected List<Byte> byteRepresentation = new ArrayList<Byte>();
+    private ByteBuffer byteRepresentation;
 
-    public List<Byte> getByteRepresentation(){
+    protected Z21Action() {
+        byteRepresentation = ByteBuffer.allocate(32);
+        // start position is 2 because 0 and 1 are reserved for length
+        byteRepresentation.position(2);
+    }
+
+    public ByteBuffer getByteRepresentation() {
         return byteRepresentation;
     }
 
     /**
      * Here actual conversion to bytes happens
-     * @param objs Whatever objects you might need to determine the bytes.
+     * 
+     * @param values
+     *            Whatever objects you might need to determine the bytes.
      */
-    protected abstract void addDataToByteRepresentation(Object[] objs);
+    protected abstract void addDataToByteRepresentation(int... values);
 
     /**
      * Adds the required length of message bytes.
      */
-    protected void addLenByte(){
-        byte len = (byte) byteRepresentation.size();
-        len += 2;
-        byteRepresentation.add(0, (byte) 0);
-        byteRepresentation.add(0, len);
+    protected void addLenByte() {
+        int len = byteRepresentation.position();
+        // len += 2;
+        byteRepresentation.put(0, (byte) (len & 0xFF));
+        byteRepresentation.put(1, (byte) 0);
+    }
+
+    protected void addByte(int inValue) {
+        byteRepresentation.put((byte) (inValue & 0xFF));
+    }
+
+    protected void addByte(byte byteValue) {
+        byteRepresentation.put(byteValue);
+    }
+
+    protected void addBytes(byte[] byteValues) {
+        byteRepresentation.put(byteValues);
+    }
+
+    protected void appendChecksum() {
+        int beginIndex = 4;
+
+        final byte[] data = byteRepresentation.array();
+        int length = byteRepresentation.position();
+
+        int xor = 0;
+        for (int index = beginIndex; index < length; index++) {
+            xor = xor ^ data[index];
+        }
+
+        addByte(xor);
     }
 }
