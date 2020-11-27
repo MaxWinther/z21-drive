@@ -1,11 +1,12 @@
 package z21Drive.responses;
 
 /**
- * Received as a response to Z21ActionLanXGetFIrmwareVersion
- * Weird display of firmware versions. Check out official documentation for more info.
+ * Received as a response to Z21ActionLanXGetFIrmwareVersion Weird display of firmware versions. Check out official
+ * documentation for more info.
+ * 
  * @see z21Drive.actions.Z21ActionLanXGetFirmwareVersion
  */
-public class Z21ResponseLanXGetFirmwareVersion extends Z21Response{
+public class Z21ResponseLanXGetFirmwareVersion extends Z21Response {
     private int firmwareVersion;
 
     public Z21ResponseLanXGetFirmwareVersion(byte[] initArray) {

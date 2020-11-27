@@ -44,37 +44,38 @@ public class BroadcastFlagHandler {
     public static boolean isReceiveCentreStatus() {
         return receiveCentreStatus;
     }
-}
 
-class Z21ActionLanSetBroadcastFlags extends Z21Action {
-    public Z21ActionLanSetBroadcastFlags(boolean receiveGlobalBroadcasts, boolean receiveAllLocos,
-        boolean receiveCentreStatus) {
-        addByte(0x50);
-        addByte(0x00);
-        addDataToByteRepresentation(receiveGlobalBroadcasts ? 0x01 : 0x00, receiveAllLocos ? 0x0100000 : 0x00,
-            receiveCentreStatus ? 0x0100 : 0x00);
-        addLenByte();
+    private static class Z21ActionLanSetBroadcastFlags extends Z21Action {
+        public Z21ActionLanSetBroadcastFlags(boolean receiveGlobalBroadcasts, boolean receiveAllLocos,
+            boolean receiveCentreStatus) {
+            addByte(0x50);
+            addByte(0x00);
+            addDataToByteRepresentation(receiveGlobalBroadcasts ? 0x01 : 0x00, receiveAllLocos ? 0x0100000 : 0x00,
+                receiveCentreStatus ? 0x0100 : 0x00);
+            addLenByte();
+        }
+
+        @Override
+        public void addDataToByteRepresentation(int... objs) {
+            int data = 0;
+            if (objs[0] > 0) {
+                data |= 0x00000001;
+            }
+            if (objs[1] > 0) {
+                data |= 0x00010000;
+            }
+            if (objs[2] > 0) {
+                data |= 0x00000100;
+            }
+            // Change order to little endian
+            ByteBuffer buff = ByteBuffer.allocate(4);
+            buff.order(ByteOrder.LITTLE_ENDIAN);
+            buff.putInt(data);
+            buff.flip();
+            for (byte i = 0; i < 4; i++) {
+                addByte(buff.get());
+            }
+        }
     }
 
-    @Override
-    public void addDataToByteRepresentation(int... objs) {
-        int data = 0;
-        if (objs[0] > 0) {
-            data |= 0x00000001;
-        }
-        if (objs[1] > 0) {
-            data |= 0x00010000;
-        }
-        if (objs[2] > 0) {
-            data |= 0x00000100;
-        }
-        // Change order to little endian
-        ByteBuffer buff = ByteBuffer.allocate(4);
-        buff.order(ByteOrder.LITTLE_ENDIAN);
-        buff.putInt(data);
-        buff.flip();
-        for (byte i = 0; i < 4; i++) {
-            addByte(buff.get());
-        }
-    }
 }

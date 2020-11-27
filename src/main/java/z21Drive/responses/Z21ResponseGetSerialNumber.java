@@ -6,7 +6,7 @@ import java.nio.ByteOrder;
 /**
  * Represents the response with serial number of z21.
  */
-public class Z21ResponseGetSerialNumber extends Z21Response{
+public class Z21ResponseGetSerialNumber extends Z21Response {
     public int serialNumber;
 
     public Z21ResponseGetSerialNumber(byte[] initArray) {
