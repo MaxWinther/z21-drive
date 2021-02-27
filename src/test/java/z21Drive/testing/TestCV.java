@@ -8,9 +8,9 @@ import z21Drive.Z21;
 import z21Drive.actions.Z21ActionLanXCVRead;
 import z21Drive.actions.Z21ActionLanXTrackPowerOff;
 import z21Drive.actions.Z21ActionLanXTrackPowerOn;
-import z21Drive.responses.ResponseTypes;
-import z21Drive.responses.Z21Response;
-import z21Drive.responses.Z21ResponseLanXCVResult;
+import z21Drive.record.Z21Record;
+import z21Drive.record.Z21RecordType;
+import z21Drive.record.xbus.Z21RecordLanXCVResult;
 import z21Drive.responses.Z21ResponseListener;
 
 /**
@@ -30,23 +30,24 @@ public class TestCV implements Runnable{
         z21.sendActionToZ21(new Z21ActionLanXTrackPowerOff());
         z21.addResponseListener(new Z21ResponseListener() {
             @Override
-            public void responseReceived(ResponseTypes type, Z21Response response) {
-                if (type == ResponseTypes.LAN_X_CV_RESULT){
-                	Z21ResponseLanXCVResult bc = (Z21ResponseLanXCVResult) response;
+            public void responseReceived(Z21RecordType type, Z21Record record) {
+                if (type == Z21RecordType.LAN_X_CV_RESULT){
+                	Z21RecordLanXCVResult bc = (Z21RecordLanXCVResult) record;
                     String o = Integer.toBinaryString(bc.getValue());
                     while (o.length() < 8) {
                     	o = "0" + o;
                     }
                     System.out.println(String.format("%3d: %3d %s", bc.getCVadr(), bc.getValue(), o));
                     sendNext(z21);
-                } else if (type == ResponseTypes.LAN_X_CV_NACK){
+
+                } else if (type == Z21RecordType.LAN_X_CV_NACK){
                 	System.out.println("Read CV failed.");
                 }
             }
 
             @Override
-            public ResponseTypes [] getListenerTypes() {
-                return new ResponseTypes[]{ResponseTypes.LAN_X_CV_RESULT, ResponseTypes.LAN_X_CV_NACK};
+            public Z21RecordType[] getListenerTypes() {
+                return new Z21RecordType[]{Z21RecordType.LAN_X_CV_RESULT, Z21RecordType.LAN_X_CV_NACK};
             }
         });
         sendNext(z21);

@@ -1,14 +1,39 @@
-package z21Drive.broadcasts;
+package z21Drive.record.xbus;
+
+import z21Drive.record.Z21DataRecord;
+
+import static z21Drive.utils.ByteUtils.fromByte;
 
 /**
  * Probably the most important broadcast, because it represents the current state of a loco. Supports up to 28
  * functions.
  */
-public class Z21BroadcastLanXLocoInfo extends Z21Broadcast {
+public class Z21RecordLanXLocoInfo extends Z21RecordXBus {
+
+    public Z21RecordLanXLocoInfo(Z21DataRecord z21DataRecord) {
+        super(z21DataRecord);
+        if (z21DataRecord.raw != null)
+            populateFields();
+    }
+
+    @Override
+    public z21Drive.record.Z21RecordType getRecordType() {
+        return z21Drive.record.Z21RecordType.LAN_X_LOCO_INFO;
+    }
+
+    @Override
+    public boolean isBroadCast() { return true; }
+
+    @Override
+    public boolean isResponse() { return false; }
+
+    @Override
+    public String toString() {
+        return super.toString() + " Addr=" + locoAddress + " InUse=" + locoInUse;
+    }
+
     private int locoAddress;
-
     private boolean locoInUse;
-
     private int speedSteps;
 
     /**
@@ -21,31 +46,14 @@ public class Z21BroadcastLanXLocoInfo extends Z21Broadcast {
     private boolean f0On, f1On, f2On, f3On, f4On, f5On, f6On, f7On, f8On, f9On, f10On, f11On, f12On, f13On, f14On,
         f15On, f16On, f17On, f18On, f19On, f20On, f21On, f22On, f23On, f24On, f25On, f26On, f27On, f28On;
 
-    public Z21BroadcastLanXLocoInfo(byte[] initArray) {
-        super(initArray);
-        boundType = BroadcastTypes.LAN_X_LOCO_INFO;
-        if (byteRepresentation != null)
-            populateFields();
-    }
 
     private void populateFields() {
-        byte adr_MSB = byteRepresentation[5];
-        byte adr_LSB = byteRepresentation[6];
+        byte adr_MSB = z21DataRecord.raw[5];
+        byte adr_LSB = z21DataRecord.raw[6];
         locoAddress = (adr_MSB & 0x3F) << 8 | adr_LSB;
 
-        // boolean[] db2bits = fromByte(byteRepresentation[7]);
-        // locoInUse = db2bits[4];
-
-        // String binary = String.format("%8s", Integer.toBinaryString(byteRepresentation[7])).replace(' ', '0');
-        // if (binary.equals("00000000") || binary.equals("00001000"))
-        // speedSteps = 14;
-        // else if (binary.equals("00000010") || binary.equals("00001010"))
-        // speedSteps = 28;
-        // else if (binary.equals("00000100") || binary.equals("00001100"))
-        // speedSteps = 128;
-
-        locoInUse = (byteRepresentation[7] & 0x80) == 0x80;
-        int speedStepsBits = byteRepresentation[7] & 0x7F;
+        locoInUse = (z21DataRecord.raw[7] & 0x80) == 0x80;
+        int speedStepsBits = z21DataRecord.raw[7] & 0x7F;
         switch (speedStepsBits) {
             case 0:
                 speedSteps = 14;
@@ -58,14 +66,15 @@ public class Z21BroadcastLanXLocoInfo extends Z21Broadcast {
                 break;
         }
 
-        direction = (byteRepresentation[8] & 0x80) == 0x80;
+        direction = (z21DataRecord.raw[8] & 0x80) == 0x80;
 
-        boolean[] db3bits = fromByte(byteRepresentation[8]);
+        boolean[] db3bits = fromByte(z21DataRecord.raw[8]);
         boolean[] speedArray = db3bits.clone();
 
         if (direction) {
-            speedArray = fromByte((byte) (byteRepresentation[8] + 128));
+            speedArray = fromByte((byte) (z21DataRecord.raw[8] + 128));
         }
+
         speedArray[0] = false;
         speed =
             ((speedArray[0] ? 1 << 7 : 0) + (speedArray[1] ? 1 << 6 : 0) + (speedArray[2] ? 1 << 5 : 0)
@@ -75,13 +84,14 @@ public class Z21BroadcastLanXLocoInfo extends Z21Broadcast {
         // Set all functions.
         // Not really a good design choice having so many variables...
         //// FIXME: 19.2.2016 one day when I have too much time change this into an array
-        boolean[] db4bits = fromByte(byteRepresentation[9]);
+        boolean[] db4bits = fromByte(z21DataRecord.raw[9]);
         f0On = db4bits[3];
         f1On = db4bits[7];
         f2On = db4bits[6];
         f3On = db4bits[5];
         f4On = db4bits[4];
-        boolean[] db5bits = fromByte(byteRepresentation[10]);
+
+        boolean[] db5bits = fromByte(z21DataRecord.raw[10]);
         f5On = db5bits[0];
         f6On = db5bits[1];
         f7On = db5bits[2];
@@ -90,7 +100,8 @@ public class Z21BroadcastLanXLocoInfo extends Z21Broadcast {
         f10On = db5bits[5];
         f11On = db5bits[6];
         f12On = db5bits[7];
-        boolean[] db6bits = fromByte(byteRepresentation[11]);
+
+        boolean[] db6bits = fromByte(z21DataRecord.raw[11]);
         f13On = db6bits[0];
         f14On = db6bits[1];
         f15On = db6bits[2];
@@ -99,7 +110,8 @@ public class Z21BroadcastLanXLocoInfo extends Z21Broadcast {
         f18On = db6bits[5];
         f19On = db6bits[6];
         f20On = db6bits[7];
-        boolean[] db7bits = fromByte(byteRepresentation[12]);
+
+        boolean[] db7bits = fromByte(z21DataRecord.raw[12]);
         f21On = db7bits[0];
         f22On = db7bits[1];
         f23On = db7bits[2];

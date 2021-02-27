@@ -3,10 +3,10 @@ package z21Drive.testing;
 import z21Drive.LocoAddressOutOfRangeException;
 import z21Drive.Z21;
 import z21Drive.actions.Z21ActionGetLocoInfo;
-import z21Drive.broadcasts.BroadcastTypes;
-import z21Drive.broadcasts.Z21Broadcast;
-import z21Drive.broadcasts.Z21BroadcastLanXLocoInfo;
+import z21Drive.record.xbus.Z21RecordLanXLocoInfo;
 import z21Drive.broadcasts.Z21BroadcastListener;
+import z21Drive.record.Z21Record;
+import z21Drive.record.Z21RecordType;
 
 /**
  * Sends request for info of loco #5 and then keeps printing any changes.
@@ -18,7 +18,10 @@ public class PrintInfo implements Runnable{
 
     public static void main(String[] args) {
         //Start things up
-        new Thread(new PrintInfo(Integer.parseInt(args[0]))).start();
+
+        int locoAddress = 9;
+
+        new Thread(new PrintInfo(locoAddress)).start();
     }
 
     public PrintInfo(int locoAdress) {
@@ -29,9 +32,9 @@ public class PrintInfo implements Runnable{
         final Z21 z21 = Z21.instance;
         z21.addBroadcastListener(new Z21BroadcastListener() {
             @Override
-            public void onBroadCast(BroadcastTypes type, Z21Broadcast broadcast) {
-                if (type == BroadcastTypes.LAN_X_LOCO_INFO){
-                    Z21BroadcastLanXLocoInfo bc = (Z21BroadcastLanXLocoInfo) broadcast;
+            public void onBroadCast(Z21RecordType type, Z21Record broadcast) {
+                if (type == Z21RecordType.LAN_X_LOCO_INFO){
+                    Z21RecordLanXLocoInfo bc = (Z21RecordLanXLocoInfo) broadcast;
                     System.out.println("Loco address: " + bc.getLocoAddress());
                     System.out.println("Lights: " + bc.isF0On());
                     System.out.println("Speed steps: " + bc.getSpeedSteps());
@@ -47,8 +50,8 @@ public class PrintInfo implements Runnable{
             }
 
             @Override
-            public BroadcastTypes[] getListenerTypes() {
-                return new BroadcastTypes[]{BroadcastTypes.LAN_X_LOCO_INFO};
+            public Z21RecordType[] getListenerTypes() {
+                return new Z21RecordType[]{Z21RecordType.LAN_X_LOCO_INFO};
             }
         });
         try {

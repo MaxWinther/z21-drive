@@ -12,7 +12,7 @@ import z21Drive.actions.Z21Action;
  * @author grizeldi
  */
 public class BroadcastFlagHandler {
-    private static boolean receiveGlobalBroadcasts = true, receiveAllLocos, receiveCentreStatus;
+    private static boolean receiveGlobalBroadcasts = true, receiveAllLocos, receiveCentreStatus, receiveLocoNetTrackOccupancy;
 
     public static void setReceive(BroadcastFlags flag, boolean receive) {
         switch (flag) {
@@ -25,12 +25,16 @@ public class BroadcastFlagHandler {
             case CENTRE_STATUS:
                 receiveCentreStatus = receive;
                 break;
+            case LOCONET_DETECTOR:
+                receiveLocoNetTrackOccupancy = receive;
+                break;
         }
         // Send updated data to z21
         Z21 z21 = Z21.instance;
         z21
             .sendActionToZ21(
-                new Z21ActionLanSetBroadcastFlags(receiveGlobalBroadcasts, receiveAllLocos, receiveCentreStatus));
+                new Z21ActionLanSetBroadcastFlags(
+                        receiveGlobalBroadcasts, receiveAllLocos, receiveCentreStatus, receiveLocoNetTrackOccupancy));
     }
 
     public static boolean isReceiveGlobalBroadcasts() {
@@ -46,12 +50,20 @@ public class BroadcastFlagHandler {
     }
 
     private static class Z21ActionLanSetBroadcastFlags extends Z21Action {
-        public Z21ActionLanSetBroadcastFlags(boolean receiveGlobalBroadcasts, boolean receiveAllLocos,
-            boolean receiveCentreStatus) {
+
+        public Z21ActionLanSetBroadcastFlags(
+                boolean receiveGlobalBroadcasts,
+                boolean receiveAllLocos,
+                boolean receiveCentreStatus,
+                boolean recieveLocoNetTrackOccupancy) {
+
             addByte(0x50);
             addByte(0x00);
-            addDataToByteRepresentation(receiveGlobalBroadcasts ? 0x01 : 0x00, receiveAllLocos ? 0x0100000 : 0x00,
-                receiveCentreStatus ? 0x0100 : 0x00);
+            addDataToByteRepresentation(
+                    receiveGlobalBroadcasts ? 0x01 : 0x00,
+                    receiveAllLocos ? 0x0100000 : 0x00,
+                    receiveCentreStatus ? 0x0100 : 0x00,
+                    recieveLocoNetTrackOccupancy ? 0x08000000 : 0x00);
             addLenByte();
         }
 
@@ -66,6 +78,9 @@ public class BroadcastFlagHandler {
             }
             if (objs[2] > 0) {
                 data |= 0x00000100;
+            }
+            if (objs[3] > 0) {
+                data |= 0x00000001;
             }
             // Change order to little endian
             ByteBuffer buff = ByteBuffer.allocate(4);

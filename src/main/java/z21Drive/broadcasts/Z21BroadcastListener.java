@@ -1,7 +1,10 @@
 package z21Drive.broadcasts;
 
-public interface Z21BroadcastListener {
-    void onBroadCast(BroadcastTypes type, Z21Broadcast broadcast);
+import z21Drive.record.Z21Record;
+import z21Drive.record.Z21RecordType;
 
-    BroadcastTypes[] getListenerTypes();
+public interface Z21BroadcastListener {
+    void onBroadCast(Z21RecordType type, Z21Record broadcast);
+
+    Z21RecordType[] getListenerTypes();
 }

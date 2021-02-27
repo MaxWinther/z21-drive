@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import z21Drive.Z21;
 import z21Drive.actions.Z21ActionGetSerialNumber;
-import z21Drive.responses.ResponseTypes;
-import z21Drive.responses.Z21Response;
-import z21Drive.responses.Z21ResponseGetSerialNumber;
+import z21Drive.record.Z21Record;
+import z21Drive.record.Z21RecordType;
+import z21Drive.record.Z21RecordGetSerialNumber;
 import z21Drive.responses.Z21ResponseListener;
 
 /**
@@ -33,14 +33,14 @@ public class Serialnumber implements Runnable {
 
         z21.addResponseListener(new Z21ResponseListener() {
             @Override
-            public void responseReceived(ResponseTypes type, Z21Response response) {
+            public void responseReceived(Z21RecordType type, Z21Record response) {
 
                 LOGGER.info("Received response: {}", response);
 
-                if (type != ResponseTypes.LAN_GET_SERIAL_NUMBER_RESPONSE) {
+                if (type != Z21RecordType.LAN_GET_SERIAL_NUMBER_RESPONSE) {
                     return;
                 }
-                Z21ResponseGetSerialNumber number = (Z21ResponseGetSerialNumber) response;
+                Z21RecordGetSerialNumber number = (Z21RecordGetSerialNumber) response;
                 LOGGER.info("Received Response: {}", number.serialNumber);
 
                 synchronized (resultLock) {
@@ -50,8 +50,8 @@ public class Serialnumber implements Runnable {
             }
 
             @Override
-            public ResponseTypes[] getListenerTypes() {
-                return new ResponseTypes[] { ResponseTypes.LAN_GET_SERIAL_NUMBER_RESPONSE };
+            public Z21RecordType[] getListenerTypes() {
+                return new Z21RecordType[] { Z21RecordType.LAN_GET_SERIAL_NUMBER_RESPONSE };
             };
         });
 

@@ -1,24 +1,34 @@
-package z21Drive.responses;
+package z21Drive.record;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Handels a RailCom-Response
+ * Handles a RailCom-Response
  * 
  * @author sven
  *
  */
-public class Z21ResponseRailcomDatachanged extends Z21Response {
+public class Z21RecordRailcomDatachanged extends Z21Record {
 
     private List<RailComData> data = new ArrayList<RailComData>();
 
-    public Z21ResponseRailcomDatachanged(byte[] initArray) {
-        super(initArray);
-        boundType = ResponseTypes.LAN_RAILCOM_DATACHANGED;
-        if (byteRepresentation != null)
+    public Z21RecordRailcomDatachanged(Z21DataRecord record) {
+        super(record);
+        if (record != null)
             populateFields();
     }
+
+    @Override
+    public Z21RecordType getRecordType() {
+        return Z21RecordType.LAN_RAILCOM_DATACHANGED;
+    }
+
+    @Override
+    public boolean isBroadCast() { return false; }
+
+    @Override
+    public boolean isResponse() { return true; }
 
     private void populateFields() {
         int nrOfDecoders = ((getByteRepresentation()[0] & 0xFF) - 4) / 13;
@@ -31,7 +41,7 @@ public class Z21ResponseRailcomDatachanged extends Z21Response {
         Integer[] data = new Integer[13];
         for (int idx = i; idx < (i + 13); idx++) {
             // System.out.print("0x" + String.format("%02X ", byteRepresentation[idx]));
-            data[idx - i] = (int) (byteRepresentation[idx] & 0xFF);
+            data[idx - i] = (int) (z21DataRecord.raw[idx] & 0xFF);
         }
 
         int locId = data[0] + (data[1] << 8);

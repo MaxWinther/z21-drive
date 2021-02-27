@@ -19,5 +19,9 @@ public enum BroadcastFlags {
     /**
      * If this is true z21 sends data about voltage, current temperature etc. to your app. Only enable it if you really need it.
      */
-    CENTRE_STATUS;
+    CENTRE_STATUS,
+    /**
+     * If this is true z21 sends data about voltage, current temperature etc. to your app. Only enable it if you really need it.
+     */
+    LOCONET_DETECTOR;
 }
