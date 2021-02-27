@@ -8,5 +8,10 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+
+    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version:'1.2.3'
+    testImplementation group: 'junit', name: 'junit', version: '4.11'
+    testImplementation('org.junit.jupiter:junit-jupiter-engine:5.6.2')
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.16.1'
 }
