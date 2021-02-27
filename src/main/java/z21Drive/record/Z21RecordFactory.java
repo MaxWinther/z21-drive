@@ -25,7 +25,10 @@ public final class Z21RecordFactory {
             return Z21RecordFactoryXBus.fromPacket(record);
 
         } else if (Z21RecordFactoryLocoNet.isLocoNetResponse(record)) {
-            return Z21RecordFactoryLocoNet.responseFromPacket(record);
+            return Z21RecordFactoryLocoNet.response(record);
+
+        } else if (Z21RecordLanSystemDataChanged.isLanSystemDataChanged(record)) {
+            return new Z21RecordLanSystemDataChanged(record);
 
         } else if ((record.header1 & 0xFF) == 0x88 && record.header2 == 0x00) {
             return new Z21RecordRailcomDatachanged(record);

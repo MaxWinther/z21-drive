@@ -28,10 +28,4 @@ public class Z21Constants {
                 return -1;
         }
     }
-
-    public final static int Z21_HEADER_1_LOCO_NET_RX = 0xA0;
-    public final static int Z21_HEADER_1_LOCO_NET_TX = 0xA1;
-    public final static int Z21_HEADER_1_LOCO_NET_DISPATCH_ADDR = 0xA3;
-
-    public final static int Z21_HEADER_2_LOCO_NET = 0x00;
 }
